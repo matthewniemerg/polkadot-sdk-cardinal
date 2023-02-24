@@ -598,6 +598,7 @@ pub mod pallet {
 			ContractInfo::<T>::process_deletion_queue_batch(&mut meter);
 			meter.consumed()
 		}
+<<<<<<< HEAD
 
 		fn integrity_test() {
 			Migration::<T>::integrity_test();
@@ -731,6 +732,8 @@ pub mod pallet {
 				storage_size_limit
 			);
 		}
+=======
+>>>>>>> 431f13f1bc (Rm integrity check from contracts & force_delayed_canonicalize (#35))
 	}
 
 	#[pallet::call]

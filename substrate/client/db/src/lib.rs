@@ -1391,6 +1391,7 @@ impl<Block: BlockT> Backend<Block> {
 		Ok(MetaUpdate { hash, number, is_best: false, is_finalized: true, with_state })
 	}
 
+<<<<<<< HEAD
 	// performs forced canonicalization with a delay after importing a non-finalized block.
 	fn force_delayed_canonicalize(
 		&self,
@@ -1441,6 +1442,8 @@ impl<Block: BlockT> Backend<Block> {
 		Ok(())
 	}
 
+=======
+>>>>>>> 431f13f1bc (Rm integrity check from contracts & force_delayed_canonicalize (#35))
 	fn try_commit_operation(&self, mut operation: BlockImportOperation<Block>) -> ClientResult<()> {
 		let mut transaction = Transaction::new();
 
@@ -1644,9 +1647,6 @@ impl<Block: BlockT> Backend<Block> {
 					&mut current_transaction_justifications,
 					true,
 				)?;
-			} else {
-				// canonicalize blocks which are old enough, regardless of finality.
-				self.force_delayed_canonicalize(&mut transaction)?
 			}
 
 			if !existing_header {
@@ -4324,204 +4324,6 @@ pub(crate) mod tests {
 		let block2 = insert_header(&backend, 2, block1, None, Default::default());
 		assert_eq!(backend.blockchain().leaves().unwrap(), vec![block2]);
 		assert_eq!(backend.blockchain().info().best_hash, block2);
-	}
-
-	#[test]
-	fn force_delayed_canonicalize_waiting_for_blocks_to_be_finalized() {
-		let pruning_modes =
-			[BlocksPruning::Some(10), BlocksPruning::KeepAll, BlocksPruning::KeepFinalized];
-
-		for pruning_mode in pruning_modes {
-			eprintln!("Running with pruning mode: {:?}", pruning_mode);
-
-			let backend = Backend::<Block>::new_test_with_tx_storage(pruning_mode, 1);
-
-			let genesis = insert_block(
-				&backend,
-				0,
-				Default::default(),
-				None,
-				Default::default(),
-				vec![],
-				None,
-			)
-			.unwrap();
-
-			let block1 = {
-				let mut op = backend.begin_operation().unwrap();
-				backend.begin_state_operation(&mut op, genesis).unwrap();
-				let mut header = Header {
-					number: 1,
-					parent_hash: genesis,
-					state_root: Default::default(),
-					digest: Default::default(),
-					extrinsics_root: Default::default(),
-				};
-
-				let storage = vec![(vec![1, 3, 5], None), (vec![5, 5, 5], Some(vec![4, 5, 6]))];
-
-				let (root, overlay) = op.old_state.storage_root(
-					storage.iter().map(|(k, v)| (k.as_slice(), v.as_ref().map(|v| &v[..]))),
-					StateVersion::V1,
-				);
-				op.update_db_storage(overlay).unwrap();
-				header.state_root = root.into();
-
-				op.update_storage(storage, Vec::new()).unwrap();
-
-				op.set_block_data(
-					header.clone(),
-					Some(Vec::new()),
-					None,
-					None,
-					NewBlockState::Normal,
-				)
-				.unwrap();
-
-				backend.commit_operation(op).unwrap();
-
-				header.hash()
-			};
-
-			if matches!(pruning_mode, BlocksPruning::Some(_)) {
-				assert_eq!(
-					LastCanonicalized::Block(0),
-					backend.storage.state_db.last_canonicalized()
-				);
-			}
-
-			// This should not trigger any forced canonicalization as we didn't have imported any
-			// best block by now.
-			let block2 = {
-				let mut op = backend.begin_operation().unwrap();
-				backend.begin_state_operation(&mut op, block1).unwrap();
-				let mut header = Header {
-					number: 2,
-					parent_hash: block1,
-					state_root: Default::default(),
-					digest: Default::default(),
-					extrinsics_root: Default::default(),
-				};
-
-				let storage = vec![(vec![5, 5, 5], Some(vec![4, 5, 6, 2]))];
-
-				let (root, overlay) = op.old_state.storage_root(
-					storage.iter().map(|(k, v)| (k.as_slice(), v.as_ref().map(|v| &v[..]))),
-					StateVersion::V1,
-				);
-				op.update_db_storage(overlay).unwrap();
-				header.state_root = root.into();
-
-				op.update_storage(storage, Vec::new()).unwrap();
-
-				op.set_block_data(
-					header.clone(),
-					Some(Vec::new()),
-					None,
-					None,
-					NewBlockState::Normal,
-				)
-				.unwrap();
-
-				backend.commit_operation(op).unwrap();
-
-				header.hash()
-			};
-
-			if matches!(pruning_mode, BlocksPruning::Some(_)) {
-				assert_eq!(
-					LastCanonicalized::Block(0),
-					backend.storage.state_db.last_canonicalized()
-				);
-			}
-
-			// This should also not trigger it yet, because we import a best block, but the best
-			// block from the POV of the db is still at `0`.
-			let block3 = {
-				let mut op = backend.begin_operation().unwrap();
-				backend.begin_state_operation(&mut op, block2).unwrap();
-				let mut header = Header {
-					number: 3,
-					parent_hash: block2,
-					state_root: Default::default(),
-					digest: Default::default(),
-					extrinsics_root: Default::default(),
-				};
-
-				let storage = vec![(vec![5, 5, 5], Some(vec![4, 5, 6, 3]))];
-
-				let (root, overlay) = op.old_state.storage_root(
-					storage.iter().map(|(k, v)| (k.as_slice(), v.as_ref().map(|v| &v[..]))),
-					StateVersion::V1,
-				);
-				op.update_db_storage(overlay).unwrap();
-				header.state_root = root.into();
-
-				op.update_storage(storage, Vec::new()).unwrap();
-
-				op.set_block_data(
-					header.clone(),
-					Some(Vec::new()),
-					None,
-					None,
-					NewBlockState::Best,
-				)
-				.unwrap();
-
-				backend.commit_operation(op).unwrap();
-
-				header.hash()
-			};
-
-			// Now it should kick in.
-			let block4 = {
-				let mut op = backend.begin_operation().unwrap();
-				backend.begin_state_operation(&mut op, block3).unwrap();
-				let mut header = Header {
-					number: 4,
-					parent_hash: block3,
-					state_root: Default::default(),
-					digest: Default::default(),
-					extrinsics_root: Default::default(),
-				};
-
-				let storage = vec![(vec![5, 5, 5], Some(vec![4, 5, 6, 4]))];
-
-				let (root, overlay) = op.old_state.storage_root(
-					storage.iter().map(|(k, v)| (k.as_slice(), v.as_ref().map(|v| &v[..]))),
-					StateVersion::V1,
-				);
-				op.update_db_storage(overlay).unwrap();
-				header.state_root = root.into();
-
-				op.update_storage(storage, Vec::new()).unwrap();
-
-				op.set_block_data(
-					header.clone(),
-					Some(Vec::new()),
-					None,
-					None,
-					NewBlockState::Best,
-				)
-				.unwrap();
-
-				backend.commit_operation(op).unwrap();
-
-				header.hash()
-			};
-
-			if matches!(pruning_mode, BlocksPruning::Some(_)) {
-				assert_eq!(
-					LastCanonicalized::Block(2),
-					backend.storage.state_db.last_canonicalized()
-				);
-			}
-
-			assert_eq!(block1, backend.blockchain().hash(1).unwrap().unwrap());
-			assert_eq!(block2, backend.blockchain().hash(2).unwrap().unwrap());
-			assert_eq!(block3, backend.blockchain().hash(3).unwrap().unwrap());
-			assert_eq!(block4, backend.blockchain().hash(4).unwrap().unwrap());
-		}
 	}
 
 	#[test]
