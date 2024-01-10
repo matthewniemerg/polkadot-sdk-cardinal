@@ -173,7 +173,11 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	spec_name: alloc::borrow::Cow::Borrowed("rococo"),
 	impl_name: alloc::borrow::Cow::Borrowed("parity-rococo-v2.0"),
 	authoring_version: 0,
+<<<<<<< HEAD
 	spec_version: 1_017_001,
+=======
+	spec_version: 1_006_000,
+>>>>>>> 2e7cc701d3 (Bump spec_version)
 	impl_version: 0,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 26,

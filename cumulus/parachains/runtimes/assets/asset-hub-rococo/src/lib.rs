@@ -125,11 +125,32 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	spec_name: alloc::borrow::Cow::Borrowed("statemine"),
 	impl_name: alloc::borrow::Cow::Borrowed("statemine"),
 	authoring_version: 1,
+<<<<<<< HEAD
 	spec_version: 1_017_001,
 	impl_version: 0,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 16,
 	system_version: 1,
+=======
+	spec_version: 1_006_000,
+	impl_version: 0,
+	apis: RUNTIME_API_VERSIONS,
+	transaction_version: 14,
+	state_version: 1,
+};
+
+#[cfg(not(feature = "state-trie-version-1"))]
+#[sp_version::runtime_version]
+pub const VERSION: RuntimeVersion = RuntimeVersion {
+	spec_name: create_runtime_str!("statemine"),
+	impl_name: create_runtime_str!("statemine"),
+	authoring_version: 1,
+	spec_version: 1_006_000,
+	impl_version: 0,
+	apis: RUNTIME_API_VERSIONS,
+	transaction_version: 14,
+	state_version: 0,
+>>>>>>> 2e7cc701d3 (Bump spec_version)
 };
 
 /// The version information used to identify this runtime when compiled natively.
