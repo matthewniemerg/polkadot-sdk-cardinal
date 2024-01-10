@@ -59,7 +59,11 @@ pub use disputes::{
 /// relatively rare.
 ///
 /// The associated worker binaries should use the same version as the node that spawns them.
+<<<<<<< HEAD
 pub const NODE_VERSION: &'static str = "1.17.8";
+=======
+pub const NODE_VERSION: &'static str = "1.6.0";
+>>>>>>> 3865fd89b5 (Bump node version to 1.6.0 in polkadot-cli)
 
 // For a 16-ary Merkle Prefix Trie, we can expect at most 16 32-byte hashes per node
 // plus some overhead:
