@@ -15120,8 +15120,13 @@ dependencies = [
 ]
 
 [[package]]
+<<<<<<< HEAD
 name = "polkadot-omni-node-lib"
 version = "0.4.3"
+=======
+name = "polkadot-parachain-bin"
+version = "1.6.0"
+>>>>>>> 950a36600d (Bump crate versions in: cumulus/polkadot-parachain/Cargo.toml)
 dependencies = [
  "assert_cmd",
  "async-trait",

@@ -1,6 +1,10 @@
 [package]
 name = "polkadot-parachain-bin"
+<<<<<<< HEAD
 version = "6.0.0"
+=======
+version = "1.6.0"
+>>>>>>> 950a36600d (Bump crate versions in: cumulus/polkadot-parachain/Cargo.toml)
 authors.workspace = true
 edition.workspace = true
 build = "build.rs"
