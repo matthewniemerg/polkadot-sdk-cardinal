@@ -18,7 +18,11 @@ rust-version = "1.64.0"
 readme = "README.md"
 authors.workspace = true
 edition.workspace = true
+<<<<<<< HEAD
 version = "21.1.0"
+=======
+version = "1.6.0"
+>>>>>>> a6b3a83877 (Bump workspace unified version)
 default-run = "polkadot"
 
 [lints]
