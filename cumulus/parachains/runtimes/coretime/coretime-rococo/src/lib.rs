@@ -150,10 +150,14 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	impl_name: alloc::borrow::Cow::Borrowed("coretime-rococo"),
 	authoring_version: 1,
 <<<<<<< HEAD
+<<<<<<< HEAD
 	spec_version: 1_017_001,
 =======
 	spec_version: 1_006_000,
 >>>>>>> 2e7cc701d3 (Bump spec_version)
+=======
+	spec_version: 1_006_001,
+>>>>>>> 481165d922 (Bump spec_version for rococo and coretime-rococo to aline with master)
 	impl_version: 0,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 2,
