@@ -583,10 +583,21 @@ pub mod pallet {
 			let mut meter = WeightMeter::with_limit(limit);
 
 			loop {
+<<<<<<< HEAD
 				match Migration::<T>::migrate(&mut meter) {
 					// There is not enough weight to perform a migration.
 					// We can't do anything more, so we return the used weight.
 					NoMigrationPerformed | InProgress { steps_done: 0 } => return meter.consumed(),
+=======
+				const reduced_weight_factor: u64 = 4;
+				let (result, weight) = Migration::<T>::migrate(remaining_weight.saturating_div(reduced_weight_factor));
+				remaining_weight.saturating_reduce(weight.saturating_mul(reduced_weight_factor));
+
+				match result {
+					// There is not enough weight to perform a migration, or make any progress, we
+					// just return the remaining weight.
+					NoMigrationPerformed | InProgress { steps_done: 0 } => return remaining_weight,
+>>>>>>> a213e2aef4 (A0-4022: Reduced multi block contract migration weight by 4 (#2))
 					// Migration is still in progress, we can start the next step.
 					InProgress { .. } => continue,
 					// Either no migration is in progress, or we are done with all migrations, we
