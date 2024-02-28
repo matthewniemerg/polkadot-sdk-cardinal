@@ -23,7 +23,12 @@ use frame_support::{
 	DefaultNoBound,
 };
 use sp_core::Get;
+<<<<<<< HEAD
 use sp_runtime::{traits::Zero, DispatchError};
+=======
+use sp_std::marker::PhantomData;
+use sp_runtime::{traits::Zero, DispatchError, Saturating};
+>>>>>>> a5f04d53df (contracts: Fix double charge of gas for host functions (#3361) (#4))
 
 #[cfg(test)]
 use std::{any::Any, fmt::Debug};
@@ -37,6 +42,7 @@ impl ChargedAmount {
 	}
 }
 
+<<<<<<< HEAD
 /// Meter for syncing the gas between the executor and the gas meter.
 #[derive(DefaultNoBound)]
 struct EngineMeter<T: Config> {
@@ -76,6 +82,8 @@ impl<T: Config> EngineMeter<T> {
 	}
 }
 
+=======
+>>>>>>> a5f04d53df (contracts: Fix double charge of gas for host functions (#3361) (#4))
 /// Used to capture the gas left before entering a host function.
 ///
 /// Has to be consumed in order to sync back the gas after leaving the host function.
@@ -142,9 +150,18 @@ pub struct GasMeter<T: Config> {
 	/// Due to `adjust_gas` and `nested` the `gas_left` can temporarily dip below its final value.
 	gas_left_lowest: Weight,
 	/// The amount of resources that was consumed by the execution engine.
+<<<<<<< HEAD
 	/// We have to track it separately in order to avoid the loss of precision that happens when
 	/// converting from ref_time to the execution engine unit.
 	engine_meter: EngineMeter<T>,
+=======
+	///
+	/// This should be equivalent to `self.gas_consumed().ref_time()` but expressed in whatever
+	/// unit the execution engine uses to track resource consumption. We have to track it
+	/// separately in order to avoid the loss of precision that happens when converting from
+	/// ref_time to the execution engine unit.
+	executor_consumed: u64,
+>>>>>>> a5f04d53df (contracts: Fix double charge of gas for host functions (#3361) (#4))
 	_phantom: PhantomData<T>,
 	#[cfg(test)]
 	tokens: Vec<ErasedToken>,
@@ -156,7 +173,11 @@ impl<T: Config> GasMeter<T> {
 			gas_limit,
 			gas_left: gas_limit,
 			gas_left_lowest: gas_limit,
+<<<<<<< HEAD
 			engine_meter: EngineMeter::new(gas_limit),
+=======
+			executor_consumed: 0,
+>>>>>>> a5f04d53df (contracts: Fix double charge of gas for host functions (#3361) (#4))
 			_phantom: PhantomData,
 			#[cfg(test)]
 			tokens: Vec::new(),
@@ -236,10 +257,23 @@ impl<T: Config> GasMeter<T> {
 	/// Needs to be called when entering a host function to update this meter with the
 	/// gas that was tracked by the executor. It tracks the latest seen total value
 	/// in order to compute the delta that needs to be charged.
+<<<<<<< HEAD
 	pub fn sync_from_executor(&mut self, engine_fuel: u64) -> Result<RefTimeLeft, DispatchError> {
 		let weight_consumed = self.engine_meter.set_fuel(engine_fuel);
 		self.gas_left
 			.checked_reduce(weight_consumed)
+=======
+	pub fn sync_from_executor(
+		&mut self,
+		executor_total: u64,
+	) -> Result<RefTimeLeft, DispatchError> {
+		let chargable_reftime = executor_total
+			.saturating_sub(self.executor_consumed)
+			.saturating_mul(u64::from(T::Schedule::get().instruction_weights.base));
+		self.executor_consumed = executor_total;
+		self.gas_left
+			.checked_reduce(Weight::from_parts(chargable_reftime, 0))
+>>>>>>> a5f04d53df (contracts: Fix double charge of gas for host functions (#3361) (#4))
 			.ok_or_else(|| Error::<T>::OutOfGas)?;
 		Ok(RefTimeLeft(self.gas_left.ref_time()))
 	}
@@ -253,8 +287,18 @@ impl<T: Config> GasMeter<T> {
 	/// It is important that this does **not** actually sync with the executor. That has
 	/// to be done by the caller.
 	pub fn sync_to_executor(&mut self, before: RefTimeLeft) -> Result<Syncable, DispatchError> {
+<<<<<<< HEAD
 		let ref_time_consumed = before.0.saturating_sub(self.gas_left().ref_time());
 		self.engine_meter.charge_ref_time(ref_time_consumed)
+=======
+		let chargable_executor_resource = before
+			.0
+			.saturating_sub(self.gas_left().ref_time())
+			.checked_div(u64::from(T::Schedule::get().instruction_weights.base))
+			.ok_or(Error::<T>::InvalidSchedule)?;
+		self.executor_consumed.saturating_accrue(chargable_executor_resource);
+		Ok(Syncable(chargable_executor_resource))
+>>>>>>> a5f04d53df (contracts: Fix double charge of gas for host functions (#3361) (#4))
 	}
 
 	/// Returns the amount of gas that is required to run the same call.

@@ -476,7 +476,62 @@ impl<T: Config> Executable<T> for WasmBlob<T> {
 				let result = func.call(&mut store, &[], &mut []);
 				Self::process_result(store, result)
 			},
+<<<<<<< HEAD
 			ExecReturn(exec_return) => Ok(exec_return),
+=======
+		)
+		.map_err(|msg| {
+			log::debug!(target: LOG_TARGET, "failed to instantiate code to wasmi: {}", msg);
+			Error::<T>::CodeRejected
+		})?;
+		store.data_mut().set_memory(memory);
+
+		// Set fuel limit for the wasmi execution.
+		// We normalize it by the base instruction weight, as its cost in wasmi engine is `1`.
+		let fuel_limit = store
+			.data_mut()
+			.ext()
+			.gas_meter_mut()
+			.gas_left()
+			.ref_time()
+			.checked_div(T::Schedule::get().instruction_weights.base as u64)
+			.ok_or(Error::<T>::InvalidSchedule)?;
+		store
+			.add_fuel(fuel_limit)
+			.expect("We've set up engine to fuel consuming mode; qed");
+
+		// Sync this frame's gas meter with the engine's one.
+		let process_result = |mut store: Store<Runtime<E>>, result| {
+			let engine_consumed_total =
+				store.fuel_consumed().expect("Fuel metering is enabled; qed");
+			let gas_meter = store.data_mut().ext().gas_meter_mut();
+			let _ = gas_meter.sync_from_executor(engine_consumed_total)?;
+			store.into_data().to_execution_result(result)
+		};
+
+		// Start function should already see the correct refcount in case it will be ever inspected.
+		if let &ExportedFunction::Constructor = function {
+			E::increment_refcount(self.code_hash)?;
+		}
+
+		// Any abort in start function (includes `return` + `terminate`) will make us skip the
+		// call into the subsequent exported function. This means that calling `return` returns data
+		// from the whole contract execution.
+		match instance.start(&mut store) {
+			Ok(instance) => {
+				let exported_func = instance
+					.get_export(&store, function.identifier())
+					.and_then(|export| export.into_func())
+					.ok_or_else(|| {
+						log::error!(target: LOG_TARGET, "failed to find entry point");
+						Error::<T>::CodeRejected
+					})?;
+
+				let result = exported_func.call(&mut store, &[], &mut []);
+				process_result(store, result)
+			},
+			Err(err) => process_result(store, Err(err)),
+>>>>>>> a5f04d53df (contracts: Fix double charge of gas for host functions (#3361) (#4))
 		}
 	}
 

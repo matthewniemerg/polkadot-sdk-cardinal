@@ -711,13 +711,22 @@ fn expand_functions(def: &EnvDef, expand_mode: ExpandMode) -> TokenStream2 {
 			quote! {
 				// Write gas from wasmi into pallet-contracts before entering the host function.
 				let __gas_left_before__ = {
+<<<<<<< HEAD
 					let fuel =
 						__caller__.get_fuel().expect("Fuel metering is enabled; qed");
+=======
+					let executor_total =
+						__caller__.fuel_consumed().expect("Fuel metering is enabled; qed");
+>>>>>>> a5f04d53df (contracts: Fix double charge of gas for host functions (#3361) (#4))
 					__caller__
 						.data_mut()
 						.ext()
 						.gas_meter_mut()
+<<<<<<< HEAD
 						.sync_from_executor(fuel)
+=======
+						.sync_from_executor(executor_total)
+>>>>>>> a5f04d53df (contracts: Fix double charge of gas for host functions (#3361) (#4))
 						.map_err(TrapReason::from)
 						.map_err(#into_host)?
 				};
@@ -733,11 +742,16 @@ fn expand_functions(def: &EnvDef, expand_mode: ExpandMode) -> TokenStream2 {
 		// Write gas from pallet-contracts into wasmi after leaving the host function.
 		let sync_gas_after = if expand_blocks {
 			quote! {
+<<<<<<< HEAD
 				let fuel = __caller__
+=======
+				let fuel_consumed = __caller__
+>>>>>>> a5f04d53df (contracts: Fix double charge of gas for host functions (#3361) (#4))
 					.data_mut()
 					.ext()
 					.gas_meter_mut()
 					.sync_to_executor(__gas_left_before__)
+<<<<<<< HEAD
 					.map_err(|err| {
 						let err = TrapReason::from(err);
 						wasmi::Error::host(err)
@@ -745,6 +759,12 @@ fn expand_functions(def: &EnvDef, expand_mode: ExpandMode) -> TokenStream2 {
 				 __caller__
 					 .set_fuel(fuel.into())
 					 .expect("Fuel metering is enabled; qed");
+=======
+					.map_err(TrapReason::from)?;
+				 __caller__
+					 .consume_fuel(fuel_consumed.into())
+					 .map_err(|_| TrapReason::from(Error::<E::T>::OutOfGas))?;
+>>>>>>> a5f04d53df (contracts: Fix double charge of gas for host functions (#3361) (#4))
 			}
 		} else {
 			quote! { }
