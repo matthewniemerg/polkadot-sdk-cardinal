@@ -68,9 +68,16 @@ pub trait SystemApi<Hash, Number> {
 	#[method(name = "system_localListenAddresses")]
 	async fn system_local_listen_addresses(&self) -> Result<Vec<String>, Error>;
 
+<<<<<<< HEAD
 	/// Returns currently connected peers
 	#[method(name = "system_peers", with_extensions)]
 	async fn system_peers(&self) -> Result<Vec<PeerInfo<Hash, Number>>, Error>;
+=======
+	/// **Warning**: This method is deprecated and will return an error. Do not use it.
+	#[method(name = "system_peers")]
+	#[deprecated(note = "Do not use this method, it will return an error.")]
+	async fn system_peers(&self) -> RpcResult<Vec<PeerInfo<Hash, Number>>>;
+>>>>>>> 8863275448 (deprecate RPCs)
 
 	/// Returns current state of the network.
 	///
@@ -104,8 +111,15 @@ pub trait SystemApi<Hash, Number> {
 
 	/// Returns the state of the syncing of the node: starting block, current best block, highest
 	/// known block.
+	///
+	/// **Warning**: This method is deprecated. It returns incorrect number of the highest block.
 	#[method(name = "system_syncState")]
+<<<<<<< HEAD
 	async fn system_sync_state(&self) -> Result<SyncState<Number>, Error>;
+=======
+	#[deprecated(note = "This method returns incorrect number of the highest block.")]
+	async fn system_sync_state(&self) -> RpcResult<SyncState<Number>>;
+>>>>>>> 8863275448 (deprecate RPCs)
 
 	/// Adds the supplied directives to the current log filter
 	///
