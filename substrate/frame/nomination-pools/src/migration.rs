@@ -54,20 +54,38 @@ pub mod versioned {
 		crate::pallet::Pallet<T>,
 		<T as frame_system::Config>::DbWeight,
 	>;
+
+	/// On this version of the code migration to V7 will not succeed unless migration to v8 was done
+	/// before. We can change the order of migrations since they are independent of each other.
+	pub type V6ToV8<T> =  frame_support::migrations::VersionedMigration<
+		6,
+		8,
+		v8::UpgradeFromV6ToV8<T>,
+		crate::pallet::Pallet<T>,
+		<T as frame_system::Config>::DbWeight,
+	>;
+
 }
 
 pub mod unversioned {
 	use super::*;
 
+<<<<<<< HEAD
 	/// Checks and updates `TotalValueLocked` if out of sync.
 	pub struct TotalValueLockedSync<T>(core::marker::PhantomData<T>);
 	impl<T: Config> OnRuntimeUpgrade for TotalValueLockedSync<T> {
+=======
+	pub struct UpgradeFromV6ToV8<T>(sp_std::marker::PhantomData<T>);
+
+	impl<T: Config> OnRuntimeUpgrade for UpgradeFromV6ToV8<T> {
+>>>>>>> 7fcabea2d0 (Fix old nomination pool migration (#8))
 		#[cfg(feature = "try-runtime")]
 		fn pre_upgrade() -> Result<Vec<u8>, TryRuntimeError> {
 			Ok(Vec::new())
 		}
 
 		fn on_runtime_upgrade() -> Weight {
+<<<<<<< HEAD
 			let migrated = BondedPools::<T>::count();
 
 			// recalculate the `TotalValueLocked` to compare with the current on-chain TVL which may
@@ -100,12 +118,33 @@ pub mod unversioned {
 			// writes: current version + (maybe) TVL
 			T::DbWeight::get()
 				.reads_writes(migrated.saturating_mul(2).saturating_add(2).into(), writes)
+=======
+			// We can change the order of migrations since they are independent of each other.
+			let w1 = VersionUncheckedMigrateV7ToV8::<T>::on_runtime_upgrade();
+			let w2 = v7::VersionUncheckedMigrateV6ToV7::<T>::on_runtime_upgrade();
+
+			w1.saturating_add(w2)
+>>>>>>> 7fcabea2d0 (Fix old nomination pool migration (#8))
 		}
 
 		#[cfg(feature = "try-runtime")]
 		fn post_upgrade(_: Vec<u8>) -> Result<(), TryRuntimeError> {
+<<<<<<< HEAD
 			Ok(())
 		}
+=======
+			VersionUncheckedMigrateV7ToV8::<T>::post_upgrade(Vec::new())?;
+			v7::VersionUncheckedMigrateV6ToV7::<T>::post_upgrade(Vec::new())
+		}
+	}
+
+	#[derive(Decode)]
+	pub struct OldCommission<T: Config> {
+		pub current: Option<(Perbill, T::AccountId)>,
+		pub max: Option<Perbill>,
+		pub change_rate: Option<CommissionChangeRate<BlockNumberFor<T>>>,
+		pub throttle_from: Option<BlockNumberFor<T>>,
+>>>>>>> 7fcabea2d0 (Fix old nomination pool migration (#8))
 	}
 
 	/// Migrate existing pools from [`adapter::StakeStrategyType::Transfer`] to
