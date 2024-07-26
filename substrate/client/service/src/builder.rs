@@ -1078,6 +1078,7 @@ where
 
 	let has_bootnodes = !network_params.network_config.network_config.boot_nodes.is_empty();
 <<<<<<< HEAD
+<<<<<<< HEAD
 	let network_mut = Net::new(network_params)?;
 	let network = network_mut.network_service().clone();
 =======
@@ -1089,6 +1090,9 @@ where
 			config.muxer_maximum_buffer_size,
 		)
 	})?;
+=======
+	let network_mut = sc_network::NetworkWorker::new(network_params)?;
+>>>>>>> 8b80e542a9 (Revert "Allow for custom [`libp2p::Transport`] implementations for NetworkWorker. Every such implementation should provide authentication and muxing mechanisms. (#9)" (#12))
 	let network = network_mut.service().clone();
 >>>>>>> 8522cd0e5a (Allow for custom [`libp2p::Transport`] implementations for NetworkWorker. Every such implementation should provide authentication and muxing mechanisms. (#9))
 

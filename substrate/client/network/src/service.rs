@@ -53,7 +53,7 @@ use crate::{
 			NotificationSenderError, NotificationSenderReady as NotificationSenderReadyT,
 		},
 	},
-	transport::{self, build_transport, NetworkConfig},
+	transport,
 	types::ProtocolName,
 	NotificationService, ReputationChange,
 };
@@ -75,6 +75,7 @@ use libp2p::{
 		NetworkBehaviour, Swarm, SwarmEvent,
 	},
 <<<<<<< HEAD
+<<<<<<< HEAD
 	PeerId,
 =======
 	Multiaddr, PeerId, TransportExt,
@@ -83,6 +84,9 @@ use libp2p::{
 	core::{muxing::StreamMuxerBox, StreamMuxer},
 	Transport,
 >>>>>>> 8522cd0e5a (Allow for custom [`libp2p::Transport`] implementations for NetworkWorker. Every such implementation should provide authentication and muxing mechanisms. (#9))
+=======
+	Multiaddr, PeerId,
+>>>>>>> 8b80e542a9 (Revert "Allow for custom [`libp2p::Transport`] implementations for NetworkWorker. Every such implementation should provide authentication and muxing mechanisms. (#9)" (#12))
 };
 use log::{debug, error, info, trace, warn};
 use metrics::{Histogram, MetricSources, Metrics};
@@ -262,14 +266,12 @@ where
 	B: BlockT + 'static,
 	H: ExHashT,
 {
-	/// Creates the network service. It allows to provide a custom implementation
-	/// of the [`libp2p::Transport`] for its underlying network transport,
-	/// i.e. a transport that should at minimum provide authentication and multiplexing.
-	/// Default implementation can be aquired by calling [`crate::transport::build_transport`].
+	/// Creates the network service.
 	///
 	/// Returns a `NetworkWorker` that implements `Future` and must be regularly polled in order
 	/// for the network processing to advance. From it, you can extract a `NetworkService` using
 	/// `worker.service()`. The `NetworkService` can be shared through the codebase.
+<<<<<<< HEAD
 <<<<<<< HEAD
 	pub fn new(params: Params<B, H, Self>) -> Result<Self, Error> {
 		let peer_store_handle = params.network_config.peer_store_handle();
@@ -289,6 +291,9 @@ where
 		SM::Error: Send + Sync,
 	{
 >>>>>>> 8522cd0e5a (Allow for custom [`libp2p::Transport`] implementations for NetworkWorker. Every such implementation should provide authentication and muxing mechanisms. (#9))
+=======
+	pub fn new(params: Params<B>) -> Result<Self, Error> {
+>>>>>>> 8b80e542a9 (Revert "Allow for custom [`libp2p::Transport`] implementations for NetworkWorker. Every such implementation should provide authentication and muxing mechanisms. (#9)" (#12))
 		let FullNetworkConfiguration {
 			notification_protocols,
 			request_response_protocols,
@@ -407,12 +412,18 @@ where
 			};
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 			transport::build_transport(
 				local_identity.clone().into(),
+=======
+			transport::build_transport(
+				local_identity.clone(),
+>>>>>>> 8b80e542a9 (Revert "Allow for custom [`libp2p::Transport`] implementations for NetworkWorker. Every such implementation should provide authentication and muxing mechanisms. (#9)" (#12))
 				config_mem,
 				network_config.yamux_window_size,
 				yamux_maximum_buffer_size,
 			)
+<<<<<<< HEAD
 =======
 			transport_builder(NetworkConfig {
 				keypair: local_identity.clone(),
@@ -424,6 +435,8 @@ where
 			.boxed()
 			.with_bandwidth_logging()
 >>>>>>> 8522cd0e5a (Allow for custom [`libp2p::Transport`] implementations for NetworkWorker. Every such implementation should provide authentication and muxing mechanisms. (#9))
+=======
+>>>>>>> 8b80e542a9 (Revert "Allow for custom [`libp2p::Transport`] implementations for NetworkWorker. Every such implementation should provide authentication and muxing mechanisms. (#9)" (#12))
 		};
 
 		let (to_notifications, from_protocol_controllers) =
