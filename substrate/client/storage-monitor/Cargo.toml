@@ -9,8 +9,8 @@ description = "Storage monitor service for substrate"
 homepage = "https://substrate.io"
 
 [dependencies]
-clap = { version = "4.4.4", features = ["derive", "string"] }
-log = "0.4.17"
+clap = { version = "4.4.18", features = ["derive", "string"] }
+log = "0.4.27"
 fs4 = "0.6.3"
 sc-client-db = { path = "../db", default-features = false}
 sp-core = { path = "../../primitives/core" }
