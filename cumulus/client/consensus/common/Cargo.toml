@@ -36,7 +36,7 @@ cumulus-client-pov-recovery = { path = "../../pov-recovery" }
 schnellru = "0.2.1"
 
 [dev-dependencies]
-futures-timer = "3.0.2"
+futures-timer = "3.0.3"
 
 # Substrate
 sp-tracing = { path = "../../../../substrate/primitives/tracing" }

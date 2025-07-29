@@ -8,7 +8,7 @@ license.workspace = true
 [dependencies]
 always-assert = "0.1"
 futures = "0.3.21"
-futures-timer = "3.0.2"
+futures-timer = "3.0.3"
 gum = { package = "tracing-gum", path = "../../gum" }
 polkadot-primitives = { path = "../../../primitives" }
 polkadot-node-subsystem = { path = "../../subsystem" }

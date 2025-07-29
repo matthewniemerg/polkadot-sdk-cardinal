@@ -7,7 +7,7 @@ license.workspace = true
 
 [dependencies]
 futures = "0.3.21"
-futures-timer = "3.0.2"
+futures-timer = "3.0.3"
 gum = { package = "tracing-gum", path = "../../gum" }
 thiserror = "1.0.48"
 async-trait = "0.1.57"
