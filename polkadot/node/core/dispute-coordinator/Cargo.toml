@@ -30,7 +30,7 @@ sp-core = { path = "../../../../substrate/primitives/core" }
 sp-keystore = { path = "../../../../substrate/primitives/keystore" }
 assert_matches = "1.4.0"
 test-helpers = { package = "polkadot-primitives-test-helpers", path = "../../../primitives/test-helpers" }
-futures-timer = "3.0.2"
+futures-timer = "3.0.3"
 sp-application-crypto = { path = "../../../../substrate/primitives/application-crypto" }
 sp-tracing = { path = "../../../../substrate/primitives/tracing" }
 

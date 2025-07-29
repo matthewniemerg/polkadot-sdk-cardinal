@@ -8,7 +8,7 @@ license.workspace = true
 
 [dependencies]
 futures = "0.3.21"
-futures-timer = "3.0.2"
+futures-timer = "3.0.3"
 gum = { package = "tracing-gum", path = "../../gum" }
 polkadot-primitives = { path = "../../../primitives" }
 sp-staking = { path = "../../../../substrate/primitives/staking", default-features = false }
@@ -37,6 +37,6 @@ sp-keystore = { path = "../../../../substrate/primitives/keystore" }
 sp-tracing = { path = "../../../../substrate/primitives/tracing" }
 sc-keystore = { path = "../../../../substrate/client/keystore" }
 sc-network = { path = "../../../../substrate/client/network" }
-futures-timer = "3.0.2"
+futures-timer = "3.0.3"
 polkadot-primitives-test-helpers = { path = "../../../primitives/test-helpers" }
 rand_chacha = "0.3"
