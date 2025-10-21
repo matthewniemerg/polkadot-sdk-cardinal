@@ -9,7 +9,7 @@ publish = false
 
 [dependencies]
 codec = { package = "parity-scale-codec", version = "3.4.0", default-features = false }
-paste = "1.0.14"
+paste = "1.0.15"
 
 # Substrate
 grandpa = { package = "sc-consensus-grandpa", path = "../../../../../substrate/client/consensus/grandpa" }
